@@ -1,0 +1,26 @@
+name: Push new tag
+
+on:
+  push:
+    branches: 
+      main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      # Fetch rev number
+      - name: Get rev number
+        id: get-rev
+        run: |
+          echo "::set-output name=REV::$(git rev-list HEAD --count)"
+
+      - name: Tag commit
+        uses: tvdias/github-tagger@v0.0.2
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          tag: ${{ steps.get-rev.outputs.REV }}
