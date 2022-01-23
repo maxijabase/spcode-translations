@@ -19,8 +19,13 @@ jobs:
         run: |
           echo "::set-output name=REV::$(git rev-list HEAD --count)"
 
-      - name: Tag commit
-        uses: tvdias/github-tagger@v0.0.2
+      - name: Create tag
+        uses: actions/github-script@v5
         with:
-          repo-token: "${{ secrets.GITHUB_TOKEN }}"
-          tag: ${{ steps.get-rev.outputs.REV }}
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/${{ steps.get-rev.outputs.REV }}',
+              sha: context.sha
+            })
